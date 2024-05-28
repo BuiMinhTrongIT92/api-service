@@ -1,5 +1,6 @@
 package com.trong.apiservice.controller;
 
+import com.trong.apiservice.configuration.aspect.UsingAspect;
 import com.trong.apiservice.model.Customer;
 import com.trong.apiservice.model.Employee;
 import com.trong.apiservice.repository.CustomerRepo;
@@ -20,6 +21,7 @@ public class ServiceController {
     @Autowired
     private EmployeeRepo employeeRepo;
     @GetMapping("/customers")
+    @UsingAspect
     public ResponseEntity<List<Customer>> getCustomers() {
         List<Customer> customers = customerRepo.findAll();
         return new ResponseEntity<>(customers, HttpStatus.OK);
