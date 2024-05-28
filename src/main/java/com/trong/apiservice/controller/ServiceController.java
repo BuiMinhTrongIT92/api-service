@@ -5,6 +5,7 @@ import com.trong.apiservice.model.Customer;
 import com.trong.apiservice.model.Employee;
 import com.trong.apiservice.repository.CustomerRepo;
 import com.trong.apiservice.repository.EmployeeRepo;
+import com.trong.apiservice.service.IHttpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,9 @@ public class ServiceController {
     private CustomerRepo customerRepo;
     @Autowired
     private EmployeeRepo employeeRepo;
+    @Autowired
+    private IHttpService httpService;
+
     @GetMapping("/customers")
     @UsingAspect
     public ResponseEntity<List<Customer>> getCustomers() {
