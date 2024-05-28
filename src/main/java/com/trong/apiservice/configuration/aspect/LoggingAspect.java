@@ -6,7 +6,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.aop.ProxyMethodInvocation;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -23,7 +22,7 @@ public class LoggingAspect {
         if (usingAspect.isUse()) {
             RequestAttributes s = RequestContextHolder.getRequestAttributes();
             String methodName = ((MethodInvocationProceedingJoinPoint) joinPoint).getSignature().getName();
-            log.info("REQUEST FROM CLIENT: {}, INFO REQUEST: {}", null != s ? ((ServletRequestAttributes) s).getRequest().getRequestURL() : methodName, CommonUtils.objectToString(joinPoint.getArgs()));
+            log.info("REQUEST FROM CLIENT: {}, CONTROLLER METHOD: {}, INFO REQUEST: {}", null != s ? ((ServletRequestAttributes) s).getRequest().getRequestURL() : "", methodName, CommonUtils.objectToString(joinPoint.getArgs()));
         }
     }
 
