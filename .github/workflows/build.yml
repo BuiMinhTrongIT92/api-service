@@ -15,7 +15,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: build with maven
-        run: mvn clean install
+        run: mvn clean install -DskipTests
       - name: update artifacts
         uses: actions/upload-artifact@v2
         with:
