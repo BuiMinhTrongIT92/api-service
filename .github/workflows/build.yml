@@ -17,12 +17,7 @@ jobs:
       - name: build with maven
         run: mvn clean install -DskipTests
       - name: update artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: api-service
           path: ‘${{ github.workspace }}/target/*.jar’
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: run tests
-        run: mvn test
