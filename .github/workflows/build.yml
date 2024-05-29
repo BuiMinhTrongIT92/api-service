@@ -21,5 +21,8 @@ jobs:
         with:
           name: api-service
           path: ‘${{ github.workspace }}/target/*.jar’
-#      - name: run test
-#        run: mvn test
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: run tests
+        run: mvn test
