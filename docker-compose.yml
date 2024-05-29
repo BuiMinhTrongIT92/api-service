@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  springboot-docker-container:
+    image: api-service-springboot
+    container_name: springboot-docker-container
+    ports:
+      - 8081:8081
+    volumes:
+      - ./:/app
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge
