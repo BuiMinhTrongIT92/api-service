@@ -4,6 +4,7 @@ import com.trong.apiservice.configuration.WebClientConfig;
 import com.trong.apiservice.configuration.aspect.UsingAspect;
 import com.trong.apiservice.configuration.handler.CustomException;
 import com.trong.apiservice.configuration.handler.ErrorCode;
+import com.trong.apiservice.configuration.handler.HttpException;
 import com.trong.apiservice.service.IHttpService;
 import com.trong.apiservice.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class HttpServiceImpl implements IHttpService {
             return executeRequest(requestSpec.retrieve());
         } catch (Exception ex) {
             log.error(String.join(":", "ERROR POST Request with authentication ", url, ex.getMessage()));
-            throw new CustomException(ErrorCode.SYSTEM_ERROR, "ERROR: POST Request with authentication");
+            return new HttpException(ErrorCode.SYSTEM_ERROR, "ERROR: POST Request with authentication");
         }
     }
 
@@ -45,7 +46,7 @@ public class HttpServiceImpl implements IHttpService {
             return executeRequest(requestSpec.retrieve());
         } catch (Exception ex) {
             log.error(String.join(": ", "ERROR GET Request with authentication: ", url, ex.getMessage()));
-            throw new CustomException(ErrorCode.SYSTEM_ERROR, "ERROR: GET Request with authentication");
+            return new HttpException(ErrorCode.SYSTEM_ERROR, "ERROR: GET Request with authentication");
         }
     }
 

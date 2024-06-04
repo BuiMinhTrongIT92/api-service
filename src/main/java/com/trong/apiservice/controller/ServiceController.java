@@ -1,16 +1,16 @@
 package com.trong.apiservice.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trong.apiservice.configuration.aspect.UsingAspect;
 import com.trong.apiservice.configuration.handler.ErrorCode;
 import com.trong.apiservice.configuration.handler.HttpException;
 import com.trong.apiservice.model.AuthRequestDTO;
-import com.trong.apiservice.model.Customer;
-import com.trong.apiservice.model.Employee;
-import com.trong.apiservice.model.SQLEntity.SQLUser;
+import com.trong.apiservice.model.dto.ProductDTO;
 import com.trong.apiservice.repository.CustomerRepo;
 import com.trong.apiservice.repository.EmployeeRepo;
 import com.trong.apiservice.repository.SQLUserRepo;
-import com.trong.apiservice.service.IHttpService;
+import com.trong.apiservice.service.IProductService;
 import com.trong.apiservice.service.impl.JWTService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -40,9 +39,13 @@ public class ServiceController {
     @Autowired
     private SQLUserRepo sqlUserRepo;
     @Autowired
+    private IProductService productService;
+    @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private JWTService jwtService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping("/login")
     @UsingAspect
@@ -66,23 +69,19 @@ public class ServiceController {
         }
     }
 
-    @GetMapping("/customers")
+    @GetMapping("/get-products")
     @UsingAspect
-    public ResponseEntity<List<Customer>> getCustomers() {
-        List<Customer> customers = customerRepo.findAll();
-        return new ResponseEntity<>(customers, HttpStatus.OK);
-    }
-    @GetMapping("/employees")
-    @UsingAspect
-    public ResponseEntity<List<Employee>> getEmployees() {
-        List<Employee> employees = employeeRepo.findAll();
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+    public ResponseEntity<Object> getProducts() {
+        Object products = productService.getAllProducts(null, null, null);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
-    @GetMapping("/users")
+    @PostMapping("/update-products")
     @UsingAspect
-    public ResponseEntity<Iterable<SQLUser>> getUser() {
-        Iterable<SQLUser> users = sqlUserRepo.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    public ResponseEntity<Object> updateProduct(@RequestBody Map<String, Object> productDTO) {
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ProductDTO product = objectMapper.convertValue(productDTO, ProductDTO.class);
+        productService.updateProduct(product, productDTO.get("_id").toString());
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }
