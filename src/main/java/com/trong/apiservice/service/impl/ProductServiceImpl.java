@@ -10,10 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -30,12 +34,26 @@ public class ProductServiceImpl implements IProductService {
     @Value("${redis.url.save-product}")
     private String saveProducts;
     @Override
-    public Object getAllProducts(String keyword, String id, PageRequest pageRequest) {
-        Object response = httpService.getWithAuthentication(baseUrl, getProducts, null);
+    public Object getAllProducts(Map<String, Object> param, PageRequest pageRequest) {
+        Object response = httpService.postWithAuthentication(baseUrl, getProducts, param,null);
         if (response instanceof HttpException || response == null) {
-            List<Product> products = productRepo.findAll();
-            if (products != null && products.size() > 0) {
-                Object saveResponse = httpService.postWithAuthentication(baseUrl, saveProducts, products, null);
+            List<Product> products = null;
+            if (null != param || !param.isEmpty()) {
+                List<Criteria> criteriaBooking = new ArrayList<>();
+                for (Map.Entry<String, Object> entry : param.entrySet()) {
+                    if (entry.getValue() != null && !entry.getValue().toString().trim().isEmpty()) {
+                        criteriaBooking.add(Criteria.where(entry.getKey()).is(entry.getValue()));
+                    }
+                }
+                products = productRepo.findAllByCondition(criteriaBooking);
+            } else {
+                products = productRepo.findAll();
+            }
+            if (null!= products && !products.isEmpty()) {
+                Map<String, Object> saveProductBody = new HashMap<>();
+                saveProductBody.put("products", products);
+                saveProductBody.put("keywords", param);
+                Object saveResponse = httpService.postWithAuthentication(baseUrl, saveProducts, saveProductBody, null);
                 if (saveResponse instanceof HttpException) {
                     log.warn("Save cache products fail");
                 }
@@ -57,7 +75,7 @@ public class ProductServiceImpl implements IProductService {
             update.set("quantityInStock", productDTO.getQuantityInStock());
             update.set("buyPrice", productDTO.getBuyPrice());
             update.set("MSRP", productDTO.getMsrp());
-            productRepo.updateDocument(update, productDTO.get_id().toString());
+            productRepo.updateDocument(update, String.valueOf(productDTO.get_id()));
 //            new Thread(() -> {
 //                Object response = httpService.postWithAuthentication(baseUrl, saveProducts, update, null);
 //                if (response instanceof HttpException) {

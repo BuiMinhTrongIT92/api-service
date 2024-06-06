@@ -6,7 +6,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class ProductRepoCustomImpl implements ProductRepoCustom{
@@ -20,5 +23,14 @@ public class ProductRepoCustomImpl implements ProductRepoCustom{
                 update,
                 Product.class
         );
+    }
+
+    @Override
+    public <T> T findAllByCondition(List<Criteria> criteriaList) {
+        return (T) mongoTemplate.find(new Query().addCriteria(
+                new Criteria().andOperator(
+                        criteriaList
+                )
+        ), Product.class);
     }
 }

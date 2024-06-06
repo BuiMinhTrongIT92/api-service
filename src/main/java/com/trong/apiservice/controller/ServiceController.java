@@ -44,7 +44,6 @@ public class ServiceController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JWTService jwtService;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping("/login")
@@ -69,19 +68,19 @@ public class ServiceController {
         }
     }
 
-    @GetMapping("/get-products")
+    @PostMapping("/get-products")
     @UsingAspect
-    public ResponseEntity<Object> getProducts() {
-        Object products = productService.getAllProducts(null, null, null);
+    public ResponseEntity<Object> getProducts(@RequestBody Map<String, Object> filter) {
+        Object products = productService.getAllProducts(filter, null);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @PostMapping("/update-products")
     @UsingAspect
     public ResponseEntity<Object> updateProduct(@RequestBody Map<String, Object> productDTO) {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         ProductDTO product = objectMapper.convertValue(productDTO, ProductDTO.class);
-        productService.updateProduct(product, productDTO.get("_id").toString());
+        productService.updateProduct(product, String.valueOf(product.get_id()));
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }
